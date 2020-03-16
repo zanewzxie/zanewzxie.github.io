@@ -1,0 +1,76 @@
+# Wilma A. Bainbridge
+# November 2016
+#
+# Simple Memory Test
+#
+# This is a simple memory test, where people indicate old/new for a stream of intermixed
+# target images and foil images
+#
+# Please cite this paper if you use this script:
+#	Bainbridge, W.A. (2017). The resiliency of memorability: A predictor of memory
+#	separate from attention and priming. arXiv.
+#
+# Note that I will not be actively troubleshooting these scripts. However, Psytoolkit
+# provides great tutorials through their website!
+
+options
+  bitmapdir stimuli    # the folder that contains the stimuli bitmaps
+  escape
+
+
+bitmaps
+  fixpoint2 # medium
+  instruction
+  afterwords
+  mistakefeedback
+# list all of your stimuli here, in the format of (example):
+  name filelocation
+
+fonts
+  arial 20
+
+table cueingtable
+  # This is the table that determines each test phase trial. This table contains:
+  # 		trialnum image oldnew
+  #
+  # trialnum = the trial number
+  # image = the image name
+  # oldnew = whether the image is a target (old, 1) or a foil (new, 2)
+  #
+  # Example:
+  1 imagename 1
+
+task cueingtask
+  table cueingtable
+  keys k l # these are the keys that will be used (l=old, l=new)
+  show rectangle 0 0 5000 5000 255 255 255 # white background
+  # set $randdelay random 100 500 # uncomment if you want a random delay
+  #############
+  # Show fixation
+  show bitmap fixpoint2
+  delay 300 # time between trials
+  clear -1
+  #############
+  # Show stimulus
+  show bitmap @2 0 0
+  # delay $randdelay # uncomment if you want a random delay
+  #############
+  # Get their response
+  readkey @3 2000 # time to show image
+  clear -1
+  if STATUS != CORRECT
+    show bitmap mistakefeedback 0 0 # show if they're incorrect
+    delay 500
+    clear -1
+  fi
+  save @1 @2 @3 RT STATUS
+  # This saves the output
+  # Data will be in the order of: trialnum image oldnew rt performance
+
+block cueingblock
+  message instruction
+  tasklist
+    cueingtask 152 all_before_repeat # do 152 trials
+  end
+  message afterwords
+end
